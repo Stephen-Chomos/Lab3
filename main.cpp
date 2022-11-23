@@ -4,7 +4,7 @@ using namespace std;
 
 void Queens(int N);
 void printBoard(int **queenBoard, int N);
-void QueenHelp(int **queenBoard, int N, int count);
+bool QueenHelp(int **queenBoard, int N, int count);
 bool isGoodMove(int **queenBoard, int N, int row, int column);
 
 void Queens(int N) {
@@ -22,13 +22,11 @@ void Queens(int N) {
 		}
 	}
 	
-	printBoard(queenBoard, N);
+	if (QueenHelp(queenBoard, N, 0) == true) {
+		printBoard(queenBoard, N);
+	}
 	
-	cout << "Setting Board" << endl;
 	
-	QueenHelp(queenBoard, N, 0);
-	
-	printBoard(queenBoard, N);
 	cout << "Delete Board" << endl;
 	for (int i = 0; i < N; ++i) {
 		delete[] queenBoard[i];
@@ -48,28 +46,27 @@ void printBoard(int **queenBoard, int N) {
 	}
 }
 
-void QueenHelp(int **queenBoard, int N, int count) {
+bool QueenHelp(int **queenBoard, int N, int count) {
 	cout << "Start" << endl;
-	int column = count;
+	if (count >= N) {
+		return true;
+	}
+	
 	for (int r = 0; r < N; ++r) {
-		if(isGoodMove(queenBoard, N, r, column)) {
-			queenBoard[r][column] = 1;
+		if(isGoodMove(queenBoard, N, r, count)) {
+			queenBoard[r][count] = 1;
 			cout << "Good Move" << endl;
-		}
-		else if (column == N - 1) {
-			printBoard(queenBoard, N);
-			cout << "Done" << endl;
-			exit(1);
-		}
-		else {
-		cout << "Recursive" << endl;
-		QueenHelp(queenBoard, N, column + 1);
-		queenBoard[r][column] = 0;
+			if (QueenHelp(queenBoard, N, count + 1)) {
+				return true;
+			}
+			queenBoard[r][count] = 0;
 		}
 	}
+	return false;
 }
 
 bool isGoodMove(int **queenBoard, int N, int row, int column) {
+	int j;
 	for (int i = 0; i < column; ++i) {
 		if (queenBoard[row][i] == 1) {
 			cout << "In column" << endl;
@@ -77,21 +74,17 @@ bool isGoodMove(int **queenBoard, int N, int row, int column) {
 		}
 	}
 	
-	for (int i = row; i > 0; --i) {
-		for (int j = column; j > 0; --j) {
-			if(queenBoard[i][j] == 1) {
-				cout << "Bottom left" << endl;
-				return false;
-			}							
-		}
+	for (int i = row, j = column; i >= 0, j >= 0; --i, --j) {
+		if(queenBoard[i][j] == 1) {
+			cout << "Bottom left" << endl;
+			return false;
+		}					
 	}
 	
-	for (int i = row; i < N; ++i) {
-		for (int j = column; j > 0; --j) {
-			if(queenBoard[i][j] == 1) {
-				cout << "Bottom right" << endl;
-				return false;
-			}
+	for (int i = row, j = column; i < N, j >= 0; ++i, --j) {
+		if(queenBoard[i][j] == 1) {
+			cout << "Bottom right" << endl;
+			return false;
 		}
 	}
 	
